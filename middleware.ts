@@ -1,0 +1,28 @@
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+
+export function middleware(request: NextRequest) {
+
+  if (request.nextUrl.pathname.startsWith("/api")) {
+    
+    const authHeader = request.headers.get("Authorization")
+
+   
+    if (!authHeader) {
+      return NextResponse.json(
+        { success: false, message: "Authorization header is required" },
+        { status: 401 }
+      )
+    }
+
+    // You can add additional authorization logic here
+    // For example, validate JWT tokens, check specific auth schemes, etc.
+  }
+
+  // Continue with the request for non-API routes or if authorization is valid
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: "/api/:path*",
+}
