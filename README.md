@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Issues_Tracker
 
-## Getting Started
+A modern issue tracking application built with Next.js.
 
-First, run the development server:
+## Features and Functionality
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+*   **Issue Tracking:** Create, assign, and track issues with ease. Set priorities, due dates, and statuses to keep your team on track.
+*   **Intuitive UI:** A clean, modern interface that makes project management a breeze. No clutter, just what you need to get work done.
+*   **Collaboration:** Work together seamlessly. Comment on issues, mention team members, and keep everyone in the loop.
+*   **Custom Workflows:** Create workflows that match your team's process. Customize statuses, labels, and more.
+*   **Real-time Updates:** See changes as they happen. No need to refresh or wait for updates.
+*   **Powerful Search:** Find anything instantly with our powerful search. Filter by assignee, status, priority, and more.
+*   **Authentication:** Secure user authentication with sign-in and sign-up functionality located at `/app/(auth)/signin/page.tsx` and `/app/(auth)/signup/page.tsx` respectively.
+*   **Dashboard:** Centralized dashboard for managing and viewing issues.
+*   **API Endpoints:** RESTful API endpoints for issue management located under `/app/api/issue/`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technology Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*   **Framework:** Next.js
+*   **UI Components:** React, custom UI components (located in `/app/components/ui/`)
+*   **Database:** PostgreSQL with Drizzle ORM (configured in `/db/index.ts` and `/db/schema.ts`)
+*   **Authentication:** JWT (JSON Web Tokens)
+*   **Styling:** Tailwind CSS
+*   **Validation:** Zod
+*   **Testing:** Vitest
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prerequisites
 
-## Learn More
+*   Node.js (version >= 18)
+*   PostgreSQL database
+*   Neon database (optional, for Vercel deployments)
 
-To learn more about Next.js, take a look at the following resources:
+## Installation Instructions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  Clone the repository:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    ```bash
+    git clone https://github.com/Mohammed-Zrirake/Issues_Tracker.git
+    cd Issues_Tracker
+    ```
 
-## Deploy on Vercel
+2.  Install dependencies:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    ```bash
+    npm install
+    # or
+    yarn install
+    # or
+    pnpm install
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3.  Set up your environment variables:
+
+    Create a `.env.local` file in the root directory with the following variables:
+
+    ```
+    DATABASE_URL=<your_database_url>
+    JWT_SECRET=<your_jwt_secret> # Minimum 32 characters long
+    VERCEL=<true or false> # Set to true if deploying to Vercel
+    ```
+
+    *   `DATABASE_URL`: The connection string to your PostgreSQL database. Example: `postgres://user:password@host:port/database` or Neon database URL.
+    *   `JWT_SECRET`: A secret key used to sign JWT tokens.  Must be at least 32 characters long.
+    *   `VERCEL`: Set to `true` when deploying to Vercel, otherwise `false`. This configures the database connection using `drizzleNeon` or `drizzlePostgres` in `/db/index.ts`.
+
+4.  Run database migrations (if necessary):
+
+    This project uses Drizzle ORM.  Refer to Drizzle ORM documentation for migration instructions.  Generally, you'll use the Drizzle CLI with commands like:
+
+    ```bash
+    drizzle-kit generate:pg #Generate migration
+    drizzle-kit push:pg #Apply migrations
+    ```
+
+5.  Seed the database (optional):
+
+    To populate the database with some initial data, run the `seed.ts` script:
+
+    ```bash
+    npm run seed
+    # or
+    yarn seed
+    # or
+    pnpm seed
+    ```
+
+    This script creates demo users (admin@example.com, user@example.com) with the password "password123" and some sample issues. The script is located at `/scripts/seed.ts`.
+
+6.  Start the development server:
+
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    # or
+    pnpm dev
+    ```
+
+    This will start the Next.js development server, usually on `http://localhost:3000`.
+
+## Usage Guide
+
+1.  Open your browser and navigate to `http://localhost:3000` (or the address where your development server is running).
+2.  If you don't have an account, click on "Sign up" to create one at `/signup`.
+3.  After signing up or if you already have an account, click on "Sign in" at `/signin` to log in.
+4.  Once logged in, you'll be redirected to the dashboard (`/dashboard`), where you can view and manage issues.
+5.  Click "New Issue" to create a new issue.  The `IssueForm` component located at `/app/components/IssueForm.tsx` is used for issue creation and editing.
+6.  To view issue details, click on an issue in the dashboard.  The issue details page is located at `/app/issues/[id]/page.tsx`.
+7.  To edit an issue, navigate to `/issues/[id]/edit` using the "Edit" button on the issue details page.
+8.  You can delete an issue using the "Delete" button on the issue details page.
+9.  To sign out, click on the "Sign Out" button in the navigation menu.
+
+## API Documentation
+
+The application includes RESTful API endpoints for managing issues. The API routes are located in the `/app/api/issue/` directory.
+
+*   **GET /api/issue:** Retrieves all issues. Returns a JSON array of issue objects.
+*   **GET /api/issue/[id]:** Retrieves a specific issue by ID. Returns a JSON object representing the issue.
+*   **POST /api/issue:** Creates a new issue. Requires a JSON payload with the following properties:
+    *   `title` (string, required): The title of the issue.
+    *   `description` (string, optional): The description of the issue.
+    *   `status` (string, optional, default: "backlog"): The status of the issue ("backlog", "todo", "in\_progress", or "done").
+    *   `priority` (string, optional, default: "medium"): The priority of the issue ("low", "medium", or "high").
+    *   `userId` (string, required): The ID of the user assigned to the issue.
+
+    Example request body:
+
+    ```json
+    {
+      "title": "New Issue",
+      "description": "This is a new issue.",
+      "status": "todo",
+      "priority": "high",
+      "userId": "user123"
+    }
+    ```
+
+## Contributing Guidelines
+
+Contributions are welcome! To contribute to this project:
+
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and commit them with descriptive commit messages.
+4.  Test your changes thoroughly.
+5.  Submit a pull request to the `The_Master` branch.
+
+## License Information
+
+No license is specified for this project. All rights are reserved by the author.
+
+## Contact/Support Information
+
+For questions, bug reports, or feature requests, please contact Mohammed-Zrirake through GitHub.
